@@ -23,34 +23,28 @@ Internal accounting and payment voucher management system built with **FastAPI**
 
 ## System Architecture
 
-```text
-┌──────────────────────────────────────────────────────────────────────────┐
-│                   React + TypeScript Frontend (Vite)                     │
-│   Dashboard · Vouchers · Sales Invoices · Scan Review · AI Command Bar   │
-└────────────────────────────────────┬─────────────────────────────────────┘
-                                     │ JWT + RBAC
-                                     ▼
-┌──────────────────────────────────────────────────────────────────────────┐
-│                      FastAPI Backend & Service Layer                     │
-│  • 4-Role RBAC (giam_doc, ke_toan, thu_quy, nhan_vien)                   │
-│  • Voucher State Machine (draft -> approved [409 lock] / void)           │
-│  • Monthly Sequence Numbering & Vietnamese Form 02-TT / 02-TNDN Export   │
-│  • Watchdog Alerts (price deviation, overdue receivables, missing IDs)   │
-├────────────────────────────────────┬─────────────────────────────────────┤
-│  Agent-BE Orchestrator             │  Vision Scan Extraction             │
-│  • Providers: Claude / NIM / Ollama│  • Providers: Claude / NVIDIA NIM   │
-│  • Tools: READ + PROPOSE only      │  • qty × unit_price == total check  │
-│  • No direct DB writes/approvals   │  • Fuzzy seller match (rapidfuzz)   │
-│  • Max 6 tool iterations           │  • Stores raw + corrected rows      │
-└────────────────────────────────────┬─────────────────────────────────────┘
-                                     ▼
-┌──────────────────────────────────────────────────────────────────────────┐
-│                  PostgreSQL 16 + Alembic Migrations                      │
-│  10+ Relational Tables · DB Trigger Blocking UPDATE/DELETE on audit_log  │
-└──────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    U["User (Accountant / Director)"] --> FE["React + TypeScript UI (Vite)"]
+    FE -->|"JWT + RBAC"| API["FastAPI Service Boundary"]
+    API <-->|"READ + PROPOSE tools only"| AG["Agent-BE (Claude / NIM / Ollama)"]
+    API <-->|"Line-item extraction"| OCR["Vision OCR + Arithmetic Check"]
+    AG -->|"Draft ProposalCard (not persisted)"| FE
+    OCR -->|"Flagged rows for review"| FE
+    FE -->|"Human Confirmation: POST /vouchers/"| API
+    API -->|"State Machine + Pydantic"| DB[("PostgreSQL 16 (Append-Only audit_log Trigger)")]
 ```
 
 `Agent-BE` has no write or approval tools. When asked to draft a voucher (e.g., *"mua 500kg mủ anh X giá 15.000"*), `propose_voucher_draft` returns a draft proposal card in the UI; saving still goes through `POST /vouchers/` with standard Pydantic validation, RBAC checks, and audit logging.
+
+---
+
+## Trade-offs & Design Decisions
+
+- **Propose-Only Tool Calling (No Autonomous Writes):** Financial vouchers affect real cash disbursements, so `Agent-BE` only exposes `read` tools plus `propose_voucher_draft`. Every mutation must pass human review and the standard `POST /vouchers/` RBAC/validation path rather than letting the LLM write directly to PostgreSQL.
+- **Direct SDK Loop Over Agent Frameworks:** Both Anthropic (`claude`) and OpenAI-compatible (`nim`, `ollama`) orchestrators are implemented directly (~180 LOC in `app/agent/orchestrator.py`) with a hard cap (`MAX_TOOL_ITERATIONS = 6`) and plain-text history sanitization, trading framework convenience for transparent prompt debugging and zero hidden retries.
+- **Immutable Approved Vouchers (`HTTP 409`) & DB-Level Audit Trigger:** Locking approved vouchers at the API layer and blocking `UPDATE`/`DELETE` on `audit_log` via a PostgreSQL trigger prevents accidental or malicious retroactive edits—corrections require creating a void/reversal trail just like real accounting ledgers.
+- **Raw + Corrected OCR Storage (`scan_imports`):** Persisting both the raw VLM extraction and the accountant's confirmed edits adds minor storage overhead while building a domain-specific labeled dataset for future handwriting OCR fine-tuning.
 
 ---
 
