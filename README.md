@@ -11,6 +11,14 @@
 
 Internal accounting and payment voucher management system built with **FastAPI**, **PostgreSQL 16**, and **React + TypeScript**. It combines role-based financial controls (RBAC, locked approved vouchers, database-level append-only audit log) with a **propose-only** LLM assistant (`Agent-BE`), vision-based purchase sheet extraction, and automated anomaly alerts.
 
+| Dashboard & Automated Watchdog Alerts | AI Command Bar (`Ctrl+K`) & Propose-Only Voucher Card |
+| :---: | :---: |
+| ![Dashboard and Watchdog Alerts](docs/screenshots/dashboard-watchdog.png) | ![AI Command Bar Proposal Card](docs/screenshots/agent-proposal-card.png) |
+
+| Payment Vouchers & Role-Gated State Machine (`Draft` → `Pending Signature` → `Signed` / `Void`) |
+| :---: |
+| ![Vouchers State Machine](docs/screenshots/vouchers-state-machine.png) |
+
 ---
 
 ## System Architecture
