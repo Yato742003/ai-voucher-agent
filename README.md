@@ -74,9 +74,9 @@ Internal accounting and payment voucher management system built with **FastAPI**
 ├── ketoan-backend/        # FastAPI API, SQLAlchemy models, Alembic migrations, Agent-BE, 85 pytest tests
 ├── ketoan-frontend/       # React + TypeScript + Vite web app + AI Command Bar
 ├── deploy/                # Docker Compose + Caddyfile reverse proxy + DB backup scripts
+├── docs/                  # Architecture notes, compliance considerations & UX roadmap (Vietnamese)
 ├── gom_nhom_phieu_chi.py  # Standalone Excel voucher-grouping script
-├── run-all.ps1            # Local dev launcher (PostgreSQL + Backend + Frontend)
-└── KE_HOACH_*.md          # Architecture notes, compliance considerations & UX roadmap (Vietnamese)
+└── run-all.ps1            # Local dev launcher (PostgreSQL + Backend + Frontend)
 ```
 
 Component documentation (Vietnamese):

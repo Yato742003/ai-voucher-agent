@@ -1,6 +1,6 @@
 # Backend — Hệ thống quản lý kế toán nội bộ
 
-Phase 0/1 (theo `KE_HOACH_HE_THONG_KE_TOAN.md`): schema DB + khung FastAPI.
+Phase 0/1 (theo `../docs/KE_HOACH_HE_THONG_KE_TOAN.md`): schema DB + khung FastAPI.
 **Đã test thật** trên PostgreSQL 16 + dữ liệu Excel thật (T6/2026) — xem mục
 "Đã kiểm thử" bên dưới để biết chính xác phần nào đã chạy được, phần nào
 chưa.
@@ -113,10 +113,10 @@ mới thật sự tạo phiếu (luôn ở trạng thái nháp, vẫn qua duyệ
 Toàn bộ ảnh gốc + kết quả thô + kết quả đã sửa được lưu trong bảng
 `scan_imports` — đây là dữ liệu gán nhãn dùng để fine-tune 1 model OCR
 riêng cho chữ viết tay của công ty sau này (xem
-`KE_HOACH_NANG_CAP_UX_TINH_NANG.md`).
+`../docs/KE_HOACH_NANG_CAP_UX_TINH_NANG.md`).
 
 **Cập nhật mới (nghiên cứu + nâng cấp UX/tính năng):** xem
-`../KE_HOACH_NANG_CAP_UX_TINH_NANG.md` để biết nguồn nghiên cứu và lý do
+`../docs/KE_HOACH_NANG_CAP_UX_TINH_NANG.md` để biết nguồn nghiên cứu và lý do
 ưu tiên. Đã thêm: `GET /reports/dashboard` (tổng quan), công nợ phải thu
 (`paid_at` trên hoá đơn bán ra + `POST /sales-invoices/{id}/mark-paid`),
 ghi chú chất lượng trên phiếu chi (`ghi_chu_chat_luong` — độ ẩm/tạp chất,
