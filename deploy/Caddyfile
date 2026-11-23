@@ -1,0 +1,27 @@
+# Caddy tự động xin & gia hạn chứng chỉ HTTPS (Let's Encrypt) cho domain
+# thật — KHÔNG hoạt động với địa chỉ IP trần, bắt buộc phải có domain trỏ
+# đúng về IP server này (bản ghi DNS loại A) trước khi chạy.
+#
+# 2 biến {$DOMAIN} và {$API_DOMAIN} lấy từ file .env (xem .env.example).
+# VD: DOMAIN=ketoan.congtyban.com, API_DOMAIN=api.ketoan.congtyban.com
+
+{$DOMAIN} {
+	reverse_proxy frontend:80
+	encode gzip
+
+	# Không cache index.html (SPA) để lần deploy sau người dùng thấy bản mới ngay
+	@indexHtml {
+		path / /index.html
+	}
+	header @indexHtml Cache-Control "no-cache"
+}
+
+{$API_DOMAIN} {
+	reverse_proxy backend:8000
+	encode gzip
+
+	# Giới hạn kích thước body request (khớp max_upload_size_mb trong Backend)
+	request_body {
+		max_size 20MB
+	}
+}

@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ketoan
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme_in_env_file}
+      POSTGRES_DB: ketoan_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      # Backup thủ công nhanh: docker compose exec db pg_dump -U ketoan ketoan_db > backup.sql
+    ports:
+      - "127.0.0.1:5432:5432"  # chỉ mở ra localhost, không public ra ngoài
+
+  backend:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql+psycopg2://ketoan:${POSTGRES_PASSWORD:-changeme_in_env_file}@db:5432/ketoan_db
+      SECRET_KEY: ${SECRET_KEY:?Phải đặt SECRET_KEY trong file .env}
+      INITIAL_ADMIN_USERNAME: ${INITIAL_ADMIN_USERNAME:-admin}
+      INITIAL_ADMIN_PASSWORD: ${INITIAL_ADMIN_PASSWORD:?Phải đặt INITIAL_ADMIN_PASSWORD trong file .env}
+      AGENT_PROVIDER: ${AGENT_PROVIDER:-claude}
+      AGENT_OLLAMA_MODEL: ${AGENT_OLLAMA_MODEL:-qwen2.5:7b}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+    volumes:
+      - uploads_data:/app/uploads
+    ports:
+      - "8000:8000"
+
+volumes:
+  db_data:
+  uploads_data:

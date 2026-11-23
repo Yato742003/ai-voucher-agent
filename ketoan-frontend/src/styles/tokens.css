@@ -1,0 +1,46 @@
+:root {
+  /* --- Màu nền: giấy sổ sách, ấm nhẹ, không trắng tinh --- */
+  --color-paper: #f6f3ec;
+  --color-paper-raised: #fffdf8;
+  --color-ink: #232220;
+  --color-ink-soft: #5c5850;
+
+  /* --- Màu chính: xanh mực đậm (ledger ink) pha xanh rừng cao su --- */
+  --color-primary: #1f3a37;
+  --color-primary-hover: #2a4d49;
+  --color-primary-soft: #e4ebe9;
+
+  /* --- Màu nhấn: nâu đất/mủ cao su, KHÔNG dùng cam đất sét (#D97757 - tell của Claude) --- */
+  --color-accent: #93552a;
+  --color-accent-hover: #7a4522;
+  --color-accent-soft: #f1e4d6;
+
+  /* --- Trạng thái phiếu — mỗi trạng thái 1 "con dấu" màu riêng --- */
+  --color-status-draft: #6b6a63;
+  --color-status-draft-bg: #e9e7df;
+  --color-status-pending: #9c6b12;
+  --color-status-pending-bg: #f3e6c8;
+  --color-status-signed: #2f6b4f;
+  --color-status-signed-bg: #dfeee5;
+  --color-status-archived: #46586b;
+  --color-status-archived-bg: #e1e7ee;
+  --color-status-void: #9c3b34;
+  --color-status-void-bg: #f4dfdc;
+
+  /* --- Đường viền, kẻ mảnh kiểu chứng từ --- */
+  --color-rule: #d8d2c4;
+  --color-rule-strong: #232220;
+
+  /* --- Typography --- */
+  --font-display: "Source Serif 4", "Georgia", serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", sans-serif;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --shadow-card: 0 1px 2px rgba(35, 34, 32, 0.06), 0 1px 1px rgba(35, 34, 32, 0.04);
+}
+
+@media (prefers-color-scheme: dark) {
+  /* Chưa làm dark mode đầy đủ — giữ nguyên bảng sáng để tránh tương phản sai màu trạng thái.
+     (Ghi chú cho việc sau: cần tách riêng biến --color-status-* khi làm dark mode thật) */
+}

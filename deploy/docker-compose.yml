@@ -1,0 +1,70 @@
+# Đặt file này ở thư mục CHA của ketoan-backend/ và ketoan-frontend/, VD:
+#
+#   cong-ty-ban/
+#     ketoan-backend/
+#     ketoan-frontend/
+#     deploy/              <- thư mục này (docker-compose.yml, Caddyfile, .env)
+#
+# Chạy: cd deploy && docker compose up -d --build
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?Phải đặt DOMAIN (VD ketoan.congtyban.com) trong file .env}
+      API_DOMAIN: ${API_DOMAIN:?Phải đặt API_DOMAIN (VD api.ketoan.congtyban.com) trong file .env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+      - backend
+
+  frontend:
+    build:
+      context: ../ketoan-frontend
+      args:
+        VITE_API_BASE_URL: https://${API_DOMAIN}
+    restart: unless-stopped
+    # KHÔNG mở port ra ngoài — chỉ Caddy truy cập qua mạng nội bộ docker
+
+  backend:
+    build:
+      context: ../ketoan-backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+psycopg2://ketoan:${POSTGRES_PASSWORD:?Phải đặt POSTGRES_PASSWORD trong .env}@db:5432/ketoan_db
+      SECRET_KEY: ${SECRET_KEY:?Phải đặt SECRET_KEY trong .env}
+      INITIAL_ADMIN_USERNAME: ${INITIAL_ADMIN_USERNAME:-admin}
+      INITIAL_ADMIN_PASSWORD: ${INITIAL_ADMIN_PASSWORD:?Phải đặt INITIAL_ADMIN_PASSWORD trong .env}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      SCAN_EXTRACTION_PROVIDER: ${SCAN_EXTRACTION_PROVIDER:-anthropic}
+      CORS_ORIGINS: '["https://${DOMAIN}"]'
+    volumes:
+      - uploads_data:/app/uploads
+    depends_on:
+      - db
+    # KHÔNG mở port ra ngoài — chỉ Caddy truy cập qua mạng nội bộ docker
+
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ketoan
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Phải đặt POSTGRES_PASSWORD trong .env}
+      POSTGRES_DB: ketoan_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5432:5432" # chỉ localhost — dùng cho scripts/backup_db.sh, KHÔNG public ra ngoài
+
+volumes:
+  db_data:
+  uploads_data:
+  caddy_data:
+  caddy_config:
