@@ -1,5 +1,6 @@
 # AI Voucher Agent — Financial Document & Payment Voucher System
 
+[![CI](https://github.com/Yato742003/ai-voucher-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/Yato742003/ai-voucher-agent/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-REST%20API-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
